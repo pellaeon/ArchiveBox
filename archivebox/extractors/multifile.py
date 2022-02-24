@@ -14,41 +14,41 @@ from ..util import (
 )
 from ..config import (
     TIMEOUT,
-    SAVE_SINGLEFILE,
+    SAVE_MULTIFILE,
     DEPENDENCIES,
-    SINGLEFILE_VERSION,
-    CHROME_BINARY,
+    MULTIFILE_VERSION,
 )
 from ..logging_util import TimedProgress
 
 
 @enforce_types
-def should_save_singlefile(link: Link, out_dir: Optional[Path]=None, overwrite: Optional[bool]=False) -> bool:
+def should_save_multifile(link: Link, out_dir: Optional[Path]=None, overwrite: Optional[bool]=False) -> bool:
     if is_static_file(link.url):
         return False
 
     out_dir = out_dir or Path(link.link_dir)
-    if not overwrite and (out_dir / 'singlefile.html').exists():
+    if not overwrite and (out_dir / 'multifile').exists():
         return False
 
-    return SAVE_SINGLEFILE
+    return SAVE_MULTIFILE
 
 
 @enforce_types
-def save_singlefile(link: Link, out_dir: Optional[Path]=None, timeout: int=TIMEOUT) -> ArchiveResult:
-    """download full site using single-file"""
+def save_multifile(link: Link, out_dir: Optional[Path]=None, timeout: int=TIMEOUT) -> ArchiveResult:
+    """
+    The `multifile` CLI outputs a directory (whose name is controlled by the `--output-directory` arg)
+    containing a main html file (whose name is controlled by the 2nd positional argument (`output` here)).
+    """
 
     out_dir = out_dir or Path(link.link_dir)
-    output = "singlefile.html"
+    output = "index.html"
 
+    # FIXME multifile CLI uses Firefox, so chrome args are ignored so far
     browser_args = chrome_args(TIMEOUT=0)
 
-    # SingleFile CLI Docs: https://github.com/gildas-lormeau/SingleFile/tree/master/cli
-    browser_args = '--browser-args={}'.format(json.dumps(browser_args[1:]))
     cmd = [
-        DEPENDENCIES['SINGLEFILE_BINARY']['path'],
-        '--browser-executable-path={}'.format(CHROME_BINARY),
-        browser_args,
+        DEPENDENCIES['MULTIFILE_BINARY']['path'],
+        '--output-directory={}'.format("multifile"),
         link.url,
         output,
     ]
@@ -66,18 +66,15 @@ def save_singlefile(link: Link, out_dir: Optional[Path]=None, timeout: int=TIMEO
             if line.strip()
         ]
         hints = (
-            'Got single-file response code: {}.'.format(result.returncode),
+            'Got multifile response code: {}.'.format(result.returncode),
             *output_tail,
         )
 
         # Check for common failure cases
-        if (result.returncode > 0) or not (out_dir / output).is_file():
-            raise ArchiveError('SingleFile was not able to archive the page', hints)
-        chmod_file(output, cwd=str(out_dir))
+        if (result.returncode > 0) or not Path(out_dir,'multifile',output).is_file():
+            raise ArchiveError('MultiFile was not able to archive the page', hints)
     except (Exception, OSError) as err:
         status = 'failed'
-        # TODO: Make this prettier. This is necessary to run the command (escape JSON internal quotes).
-        cmd[2] = browser_args.replace('"', "\\\"")
         output = err
     finally:
         timer.end()
@@ -85,7 +82,7 @@ def save_singlefile(link: Link, out_dir: Optional[Path]=None, timeout: int=TIMEO
     return ArchiveResult(
         cmd=cmd,
         pwd=str(out_dir),
-        cmd_version=SINGLEFILE_VERSION,
+        cmd_version=MULTIFILE_VERSION,
         output=output,
         status=status,
         **timer.stats,

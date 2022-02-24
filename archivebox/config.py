@@ -102,6 +102,7 @@ CONFIG_SCHEMA: Dict[str, ConfigDefaultDict] = {
         'SAVE_WGET':                {'type': bool,  'default': True, 'aliases': ('FETCH_WGET',)},
         'SAVE_WGET_REQUISITES':     {'type': bool,  'default': True, 'aliases': ('FETCH_WGET_REQUISITES',)},
         'SAVE_SINGLEFILE':          {'type': bool,  'default': True, 'aliases': ('FETCH_SINGLEFILE',)},
+        'SAVE_MULTIFILE':           {'type': bool,  'default': True, 'aliases': ('FETCH_MULTIFILE',)},
         'SAVE_READABILITY':         {'type': bool,  'default': True, 'aliases': ('FETCH_READABILITY',)},
         'SAVE_MERCURY':             {'type': bool,  'default': True, 'aliases': ('FETCH_MERCURY',)},
         'SAVE_PDF':                 {'type': bool,  'default': True, 'aliases': ('FETCH_PDF',)},
@@ -181,6 +182,7 @@ CONFIG_SCHEMA: Dict[str, ConfigDefaultDict] = {
         'USE_CURL':                 {'type': bool,  'default': True},
         'USE_WGET':                 {'type': bool,  'default': True},
         'USE_SINGLEFILE':           {'type': bool,  'default': True},
+        'USE_MULTIFILE':            {'type': bool,  'default': True},
         'USE_READABILITY':          {'type': bool,  'default': True},
         'USE_MERCURY':              {'type': bool,  'default': True},
         'USE_GIT':                  {'type': bool,  'default': True},
@@ -193,6 +195,7 @@ CONFIG_SCHEMA: Dict[str, ConfigDefaultDict] = {
         'GIT_BINARY':               {'type': str,   'default': 'git'},
         'WGET_BINARY':              {'type': str,   'default': 'wget'},
         'SINGLEFILE_BINARY':        {'type': str,   'default': lambda c: bin_path('single-file')},
+        'MULTIFILE_BINARY':         {'type': str,   'default': 'multifile'},
         'READABILITY_BINARY':       {'type': str,   'default': lambda c: bin_path('readability-extractor')},
         'MERCURY_BINARY':           {'type': str,   'default': lambda c: bin_path('mercury-parser')},
         'YOUTUBEDL_BINARY':         {'type': str,   'default': 'youtube-dl'},
@@ -371,6 +374,9 @@ DYNAMIC_CONFIG_SCHEMA: ConfigDefaultDict = {
 
     'USE_SINGLEFILE':           {'default': lambda c: c['USE_SINGLEFILE'] and c['SAVE_SINGLEFILE']},
     'SINGLEFILE_VERSION':       {'default': lambda c: bin_version(c['SINGLEFILE_BINARY']) if c['USE_SINGLEFILE'] else None},
+
+    'USE_MULTIFILE':            {'default': lambda c: c['USE_MULTIFILE'] and c['SAVE_MULTIFILE']},
+    'MULTIFILE_VERSION':        {'default': lambda c: bin_version(c['MULTIFILE_BINARY']) if c['USE_MULTIFILE'] else None},
 
     'USE_READABILITY':          {'default': lambda c: c['USE_READABILITY'] and c['SAVE_READABILITY']},
     'READABILITY_VERSION':      {'default': lambda c: bin_version(c['READABILITY_BINARY']) if c['USE_READABILITY'] else None},
@@ -871,6 +877,13 @@ def get_dependency_info(config: ConfigDict) -> ConfigValue:
             'hash': bin_hash(config['SINGLEFILE_BINARY']),
             'enabled': config['USE_SINGLEFILE'],
             'is_valid': bool(config['SINGLEFILE_VERSION']),
+        },
+        'MULTIFILE_BINARY': {
+            'path': bin_path(config['MULTIFILE_BINARY']),
+            'version': config['MULTIFILE_VERSION'],
+            'hash': bin_hash(config['MULTIFILE_BINARY']),
+            'enabled': config['USE_MULTIFILE'],
+            'is_valid': bool(config['MULTIFILE_VERSION']),
         },
         'READABILITY_BINARY': {
             'path': bin_path(config['READABILITY_BINARY']),

@@ -383,7 +383,8 @@ class Link:
             'screenshot.png',
             'output.html',
             'media',
-            'singlefile.html'
+            'singlefile.html',
+            'multifile.html'
         )
 
         return any(
@@ -395,8 +396,8 @@ class Link:
         """get the latest output that each archive method produced for link"""
         
         ARCHIVE_METHODS = (
-            'title', 'favicon', 'wget', 'warc', 'singlefile', 'pdf',
-            'screenshot', 'dom', 'git', 'media', 'archive_org',
+            'title', 'favicon', 'wget', 'warc', 'singlefile', 'multifile',
+            'pdf', 'screenshot', 'dom', 'git', 'media', 'archive_org',
         )
         latest: Dict[str, ArchiveOutput] = {}
         for archive_method in ARCHIVE_METHODS:
@@ -427,6 +428,7 @@ class Link:
             'wget_path': wget_output_path(self),
             'warc_path': 'warc/',
             'singlefile_path': 'singlefile.html',
+            'multifile_path': 'multifile/index.html',
             'readability_path': 'readability/content.html',
             'mercury_path': 'mercury/content.html',
             'pdf_path': 'output.pdf',
@@ -450,6 +452,7 @@ class Link:
                 'screenshot_path': static_path,
                 'dom_path': static_path,
                 'singlefile_path': static_path,
+                'multifile_path': static_path,
                 'readability_path': static_path,
                 'mercury_path': static_path,
             })

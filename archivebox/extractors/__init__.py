@@ -29,6 +29,7 @@ from .title import should_save_title, save_title
 from .favicon import should_save_favicon, save_favicon
 from .wget import should_save_wget, save_wget
 from .singlefile import should_save_singlefile, save_singlefile
+from .multifile import should_save_multifile, save_multifile
 from .readability import should_save_readability, save_readability
 from .mercury import should_save_mercury, save_mercury
 from .pdf import should_save_pdf, save_pdf
@@ -46,6 +47,7 @@ def get_default_archive_methods():
         ('favicon', should_save_favicon, save_favicon),
         ('headers', should_save_headers, save_headers),
         ('singlefile', should_save_singlefile, save_singlefile),
+        ('multifile', should_save_multifile, save_multifile),
         ('pdf', should_save_pdf, save_pdf),
         ('screenshot', should_save_screenshot, save_screenshot),
         ('dom', should_save_dom, save_dom),
